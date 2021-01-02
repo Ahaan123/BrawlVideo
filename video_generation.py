@@ -1,6 +1,6 @@
 import praw
 from moviepy.editor import *
-
+from PIL import Image
 
 client_id = '-a3rFPB9I37hbw'
 client_secret = 'ghA0sWj50nO50FQe4z5hMvFYwFY'
@@ -23,5 +23,8 @@ def get_memes(li):
     return meme_list
 
 memes = get_memes(50)
-clip = ImageSequenceClip(memes, fps=24)
-clip.write_videofile('test.mp4')
+for idx, meme in enumerate(memes):
+    img = Image.new('RGB', (800, 400), color='white')
+    img2 = Image.open(meme)
+    img.paste(img2)
+    img.save('video_data/'+idx+'.png')
