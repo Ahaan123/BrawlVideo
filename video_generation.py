@@ -1,4 +1,6 @@
 import praw
+from moviepy.editor import *
+
 
 client_id = '-a3rFPB9I37hbw'
 client_secret = 'ghA0sWj50nO50FQe4z5hMvFYwFY'
@@ -9,9 +11,9 @@ password = 'Prince#2'
 reddit = praw.Reddit(client_id = client_id, client_secret=client_secret, user_agent=user_agent, username=username, password=password)
 subred = reddit.subreddit('brawlstars')
 
-def get_memes():
+def get_memes(li):
     meme_list = []
-    for post in subred.search('flair:"Humor"', limit=50):
+    for post in subred.search('flair:"Humor"', limit=li):
         #length-4 to length-1
         meme_url = str(post.url)
         extension = meme_url[len(meme_url)-4:len(meme_url)]
@@ -20,3 +22,9 @@ def get_memes():
 
     return meme_list
 
+memes = get_memes(50)
+clips = [ImageClip(m).set_duration(2)
+      for m in memes]
+
+concat_clip = concatenate_videoclips(clips, method="compose")
+concat_clip.write_videofile("test.mp4", fps=24)
