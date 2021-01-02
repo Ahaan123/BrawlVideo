@@ -1,6 +1,9 @@
 import praw
 from moviepy.editor import *
 from PIL import Image
+import requests
+import os
+from pytesseract import image_to_string
 
 client_id = '-a3rFPB9I37hbw'
 client_secret = 'ghA0sWj50nO50FQe4z5hMvFYwFY'
@@ -22,9 +25,29 @@ def get_memes(li):
 
     return meme_list
 
-memes = get_memes(50)
+memes = get_memes(5)
 for idx, meme in enumerate(memes):
-    img = Image.new('RGB', (800, 400), color='white')
-    img2 = Image.open(meme)
-    img.paste(img2)
-    img.save('video_data/'+idx+'.png')
+    img_data = requests.get(meme).content
+    with open(str(idx)+'.png', 'wb') as handler:
+        handler.write(img_data)
+    
+    background = Image.new('RGB', (1920, 1080), color='white')
+    img2 = Image.open(str(idx)+'.png')
+    img_w, img_h = img2.size
+    bg_w, bg_h = background.size
+    offset = ((bg_w - img_w) // 2, (bg_h - img_h) // 2)
+    background.paste(img2, offset)
+    background.save('video_data/'+str(idx)+'.png')
+    os.remove(str(idx)+'.png')
+
+files = os.listdir('video_data')
+cleaned_files = ['video_data/'+path for path in files]
+image_text  = []
+for fpath in cleaned_files:
+    i = Image.open(fpath)
+    st = image_to_string(i)
+    image_text.append(st)
+
+print(image_text)
+clip = ImageSequenceClip(cleaned_files, fps=1)
+clip.write_videofile('test.mp4')
