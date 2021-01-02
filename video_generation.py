@@ -23,8 +23,5 @@ def get_memes(li):
     return meme_list
 
 memes = get_memes(50)
-clips = [ImageClip(m).set_duration(2)
-      for m in memes]
-
-concat_clip = concatenate_videoclips(clips, method="compose")
-concat_clip.write_videofile("test.mp4", fps=24)
+clip = ImageSequenceClip(memes, fps=24)
+clip.write_videofile('test.mp4')
